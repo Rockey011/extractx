@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExtractX — AI Web Data Extractor</title>
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --card: #141416;
+    --border: #27272a;
+    --text: #e4e4e7;
+    --muted: #71717a;
+    --accent: #6d28d9;
+    --accent-glow: #8b5cf6;
+    --green: #22c55e;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 640px; width: 100%; }
+  
+  /* Hero */
+  .hero {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-glow), #a78bfa, #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+  .hero p { color: var(--muted); font-size: 1.1rem; }
+  
+  /* Features */
+  .features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .feature {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+  }
+  .feature .icon { font-size: 1.5rem; margin-bottom: 0.25rem; }
+  .feature h3 { font-size: 0.95rem; margin-bottom: 0.25rem; }
+  .feature p { color: var(--muted); font-size: 0.85rem; }
+  
+  /* Pricing card */
+  .pricing {
+    background: var(--card);
+    border: 2px solid var(--accent);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .pricing::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, var(--accent) 0%, transparent 70%);
+    opacity: 0.05;
+  }
+  .pricing .price {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--accent-glow);
+  }
+  .pricing .price sub { font-size: 1rem; color: var(--muted); font-weight: 400; }
+  .pricing .one-time { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+  
+  /* Payment section */
+  .payment {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .payment h3 { text-align: center; margin-bottom: 1rem; }
+  
+  .address-box {
+    background: #0f0f12;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    word-break: break-all;
+    color: var(--text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .copy-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .copy-btn:hover { background: var(--accent-glow); }
+  .copy-btn.copied { background: var(--green); }
+  
+  .qr-section {
+    text-align: center;
+    margin: 1rem 0;
+  }
+  .qr-section canvas { 
+    border-radius: 12px;
+    background: white;
+    padding: 8px;
+  }
+  
+  .steps {
+    list-style: none;
+    counter-reset: step;
+  }
+  .steps li {
+    counter-increment: step;
+    padding: 0.5rem 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .steps li::before {
+    content: counter(step);
+    background: var(--accent);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  
+  .verification {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .verification h3 { margin-bottom: 0.75rem; }
+  .verification input {
+    width: 100%;
+    background: #0f0f12;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    color: var(--text);
+    font-family: monospace;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+  .verify-btn {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .verify-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  
+  .status {
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .status.checking { background: #1e293b; color: #94a3b8; }
+  .status.success { background: #052e16; color: #4ade80; }
+  .status.error { background: #450a0a; color: #f87171; }
+  
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: 2rem;
+  }
+  footer a { color: var(--accent-glow); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  
+  <!-- Hero -->
+  <div class="hero">
+    <h1>ExtractX</h1>
+    <p>AI-powered web data extraction. Point at any URL, get structured data.</p>
+  </div>
+  
+  <!-- Features -->
+  <div class="features">
+    <div class="feature">
+      <div class="icon">🎯</div>
+      <h3>6 Built-in Templates</h3>
+      <p>Amazon, Twitter, LinkedIn, Hacker News, Reddit, Articles</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🤖</div>
+      <h3>AI-Powered</h3>
+      <p>Uses GPT-4/Claude for intelligent extraction</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📦</div>
+      <h3>Multi-Format</h3>
+      <p>Export to JSON, CSV, Markdown, Excel</p>
+    </div>
+    <div class="feature">
+      <div class="icon">⚡</div>
+      <h3>CLI & Python API</h3>
+      <p>One command or integrate into scripts</p>
+    </div>
+  </div>
+  
+  <!-- Pricing -->
+  <div class="pricing">
+    <div class="price">$29<sub> USD</sub></div>
+    <div class="one-time">One-time purchase · Lifetime access · Free updates</div>
+    <p style="color:var(--muted);font-size:0.85rem">Pay with SOL or USDC on Solana</p>
+  </div>
+  
+  <!-- Payment -->
+  <div class="payment">
+    <h3>📤 Send Payment</h3>
+    <p style="color:var(--muted);font-size:0.85rem;text-align:center;margin-bottom:1rem">
+      Amount: <strong>0.22 SOL</strong> (~$29 USD)
+    </p>
+    
+    <div class="address-box" id="addressBox">
+      <span id="address">2iwr9MKbuJXmVxy12Ayde7UNnFPhZa9MT4imshvn3vJD</span>
+      <button class="copy-btn" onclick="copyAddress()" id="copyBtn">Copy</button>
+    </div>
+    
+    <div class="qr-section" id="qrCode">
+      <canvas id="qrCanvas"></canvas>
+    </div>
+    
+    <ol class="steps">
+      <li>Open your Solana wallet (Phantom, Solflare, Backpack)</li>
+      <li>Send <strong>0.22 SOL</strong> to the address above</li>
+      <li>Copy the transaction signature (TX ID)</li>
+      <li>Paste it below to verify & download instantly</li>
+    </ol>
+  </div>
+  
+  <!-- Verification -->
+  <div class="verification">
+    <h3>✅ Verify Payment</h3>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem">
+      Paste your Solana transaction signature to get your download link.
+    </p>
+    <input type="text" id="txInput" placeholder="e.g. 5Ux7...abc123 (Solana TX signature)" />
+    <button class="verify-btn" id="verifyBtn" onclick="verifyTx()">Verify & Download</button>
+    <div id="status"></div>
+  </div>
+  
+  <footer>
+    <a href="https://github.com/Rockey011/extractx" target="_blank">View on GitHub</a> · 
+    Questions? DM <a href="https://t.me/nuxer" target="_blank">@nuxer</a> on Telegram
+  </footer>
+</div>
+
+<script>
+// QR Code generation
+const qrCanvas = document.getElementById('qrCanvas');
+const qr = (function() {
+  // Minimal QR code generator
+  const size = 200;
+  qrCanvas.width = size;
+  qrCanvas.height = size;
+  const ctx = qrCanvas.getContext('2d');
+  
+  // Solana Pay URL format
+  const payUrl = 'solana:2iwr9MKbuJXmVxy12Ayde7UNnFPhZa9MT4imshvn3vJD?amount=0.22&label=ExtractX&message=Purchase+ExtractX+AI+Web+Data+Extractor';
+  
+  // Simple QR using QR Code API
+  const img = new Image();
+  img.onload = () => ctx.drawImage(img, 0, 0, size, size);
+  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(payUrl);
+})();
+
+function copyAddress() {
+  const addr = document.getElementById('address').textContent;
+  navigator.clipboard.writeText(addr).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+async function verifyTx() {
+  const txId = document.getElementById('txInput').value.trim();
+  const btn = document.getElementById('verifyBtn');
+  const status = document.getElementById('status');
+  
+  if (!txId) {
+    status.className = 'status error';
+    status.textContent = 'Please paste your transaction signature';
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = 'Checking...';
+  status.className = 'status checking';
+  status.textContent = 'Verifying transaction on Solana...';
+  
+  try {
+    const rpcUrl = 'https://api.mainnet-beta.solana.com';
+    const body = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getTransaction',
+      params: [txId, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 }]
+    };
+    
+    const resp = await fetch(rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await resp.json();
+    
+    if (data.error) {
+      status.className = 'status error';
+      status.textContent = 'Transaction not found. Check the signature and try again.';
+      btn.disabled = false;
+      btn.textContent = 'Verify & Download';
+      return;
+    }
+    
+    const tx = data.result;
+    const targetAddr = '2iwr9MKbuJXmVxy12Ayde7UNnFPhZa9MT4imshvn3vJD';
+    
+    // Check if payment went to our address
+    const preBalances = tx.meta.preBalances;
+    const postBalances = tx.meta.postBalances;
+    const accountKeys = tx.transaction.message.accountKeys;
+    
+    // Find our address index
+    let ourIdx = -1;
+    accountKeys.forEach((key, i) => {
+      if (key.pubkey === targetAddr) ourIdx = i;
+    });
+    
+    if (ourIdx === -1) {
+      status.className = 'status error';
+      status.textContent = 'This transaction does not involve our payment address.';
+      btn.disabled = false;
+      btn.textContent = 'Verify & Download';
+      return;
+    }
+    
+    const diff = (postBalances[ourIdx] - preBalances[ourIdx]) / 1e9;
+    
+    if (diff >= 0.20) {
+      status.className = 'status success';
+      status.innerHTML = `✅ Payment confirmed: ${diff.toFixed(3)} SOL received!<br><br>
+        <a href="https://github.com/Rockey011/extractx/releases/download/v0.1.0/extractx-v0.1.0.tar.gz" 
+           style="color:#4ade80;font-size:1.1rem;font-weight:700;text-decoration:underline">
+           📥 Download ExtractX v0.1.0
+        </a><br><br>
+        <small style="color:var(--muted)">Install: <code>pip install extractx</code> or download the tarball above.</small>`;
+      btn.style.display = 'none';
+      document.getElementById('txInput').style.display = 'none';
+    } else {
+      status.className = 'status error';
+      status.textContent = `Payment too small: ${diff.toFixed(3)} SOL. Minimum: 0.20 SOL.`;
+      btn.disabled = false;
+      btn.textContent = 'Verify & Download';
+    }
+  } catch(e) {
+    status.className = 'status error';
+    status.textContent = 'Network error. Please try again.';
+    btn.disabled = false;
+    btn.textContent = 'Verify & Download';
+  }
+}
+</script>
+</body>
+</html>
